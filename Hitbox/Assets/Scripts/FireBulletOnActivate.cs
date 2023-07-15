@@ -9,6 +9,9 @@ public class FireBulletOnActivate : MonoBehaviour
     public Transform spawnPoint;
     public float fireSpeed = 20;
     public float ammunition = 10;
+    public float fireRate = 0.3f;
+    [SerializeField]
+    AudioClip gunshot;
     // Start is called before the first frame update
     void Start()
     {
@@ -16,20 +19,25 @@ public class FireBulletOnActivate : MonoBehaviour
         grabbable.activated.AddListener(FireBullet);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+
     public void FireBullet(ActivateEventArgs arg)
     {
         if(ammunition > 0) {
+            GetComponent<AudioSource>().PlayOneShot(gunshot, 0.5f);
             GameObject spawnedBullet = Instantiate(bullet);
             spawnedBullet.transform.position = spawnPoint.position;
             spawnedBullet.GetComponent<Rigidbody>().velocity = spawnPoint.forward * fireSpeed;
             Destroy(spawnedBullet, 5);
-            ammunition -= 1;
+            --ammunition;
         }
         
     }
-}
+    void OnTriggerEnter (Collider other) 
+    {
+        if(other.gameObject.tag == "Ammo")
+        {
+            ammunition = 10;
+        }
+    }
+    
+    }
