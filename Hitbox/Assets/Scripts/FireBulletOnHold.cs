@@ -8,7 +8,9 @@ public class FireBulletOnHold : MonoBehaviour
     public GameObject bullet;
     public Transform spawnPoint;
     public float fireSpeed = 20;
-    public float ammunition = 99    ;
+    public float ammunition = 99;
+    [SerializeField]
+    AudioClip gunshot;
     // Start is called before the first frame update
     void Start()
     {
@@ -25,6 +27,7 @@ public class FireBulletOnHold : MonoBehaviour
     {
         if (ammunition > 0)
         {
+            GetComponent<AudioSource>().PlayOneShot(gunshot, 0.5f);
             GameObject spawnedBullet = Instantiate(bullet);
             spawnedBullet.transform.position = spawnPoint.position;
             spawnedBullet.GetComponent<Rigidbody>().velocity = spawnPoint.forward * fireSpeed;

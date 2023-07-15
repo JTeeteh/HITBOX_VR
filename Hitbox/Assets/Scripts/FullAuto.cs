@@ -7,41 +7,63 @@ public class FullAuto : MonoBehaviour
 {
     public GameObject bullet;
     public Transform spawnPoint;
-    public float fireSpeed = 20;
-    public float ammunition = 30;
-    public float fireRate = 0.3f;
-    [SerializeField]
-    AudioClip gunshot;
-    // Start is called before the first frame update
+    public float fireSpeed = 20f;
+    public float ammunition = 30f;
+    public float fireRate = 0.1f;
+    [SerializeField] AudioClip gunshot;
+
+    private XRGrabInteractableTwoAttach interactor;
+    private bool isFiring = false;
+    private float timer = 0f;
+
     void Start()
     {
-        XRGrabInteractable grabbable = GetComponent<XRGrabInteractable>();
-        grabbable.activated.AddListener(fullAuto);
+        interactor = GetComponent<XRGrabInteractableTwoAttach>();
+        //interactor.activated.AddListener(StartFiring);
+        //interactor.selectExited.AddListener(StopFiring);
     }
 
-  
     void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "Ammo")
         {
-            ammunition = 30;
+            ammunition = 30f;
         }
     }
-    public void fullAuto(ActivateEventArgs arg)
-    {
-        float timer = 0;
-        while (ammunition > 0)
-        {
 
-            timer += (10.0f * Time.deltaTime);
+    void Update()
+    {
+        if (isFiring)
+        {
+            timer += Time.deltaTime;
             if (timer > fireRate)
             {
-                GameObject spawnedBullet = Instantiate(bullet);
-                spawnedBullet.transform.position = spawnPoint.position;
-                spawnedBullet.GetComponent<Rigidbody>().velocity = spawnPoint.forward * fireSpeed;
-                timer = 0;
-                --ammunition;
+                FireBullet();
+                timer = 0f;
             }
+        }
+    }
+
+    public void StartFiring()
+    {
+        isFiring = true;
+    }
+
+    public void StopFiring()
+    {
+        isFiring = false;
+    }
+
+    private void FireBullet()
+    {
+        if (ammunition > 0)
+        {
+            GetComponent<AudioSource>().PlayOneShot(gunshot, 0.5f);
+            GameObject spawnedBullet = Instantiate(bullet);
+            spawnedBullet.transform.position = spawnPoint.position;
+            spawnedBullet.GetComponent<Rigidbody>().velocity = spawnPoint.forward * fireSpeed;
+            Destroy(spawnedBullet, 5f);
+            ammunition--;
         }
     }
 }
